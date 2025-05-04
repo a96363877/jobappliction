@@ -164,7 +164,7 @@ export default function JobApplicationForm() {
       setStep(1)
 
       // Redirect to a thank you page
-      router.push("/thank-you")
+      router.push("/thanks-page")
     } catch (error) {
       console.error("Error submitting application:", error)
       toast({

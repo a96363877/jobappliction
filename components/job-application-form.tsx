@@ -70,9 +70,7 @@ const formSchema = z.object({
         ].includes(file?.type),
       "File must be PDF, DOC, or DOCX",
     ),
-  termsAccepted: z.literal(boolean, {
-    errorMap: () => ({ message: "You must accept the terms and conditions" }),
-  }),
+  
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -102,7 +100,6 @@ export default function JobApplicationForm() {
       education: "",
       skills: "",
       references: "",
-      termsAccepted: false,
     },
     mode: "onChange",
   })
@@ -184,7 +181,7 @@ export default function JobApplicationForm() {
 
     switch (step) {
       case 1:
-        fieldsToValidate = ["usId", "cv", "termsAccepted"]
+        fieldsToValidate = ["usId", "cv"]
         break
       case 2:
         fieldsToValidate = ["firstName", "lastName", "email", "phone", "dateOfBirth"]
@@ -394,8 +391,7 @@ export default function JobApplicationForm() {
 
                     <div className="mt-8">
                       <FormField
-                        control={form.control}
-                        name="termsAccepted"
+                        control={form.control as any}
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                             <FormControl>
@@ -418,8 +414,7 @@ export default function JobApplicationForm() {
                               </FormDescription>
                             </div>
                           </FormItem>
-                        )}
-                      />
+                        )} name={""}                      />
                     </div>
                   </div>
                 </div>
@@ -722,12 +717,7 @@ export default function JobApplicationForm() {
                                 </FormControl>
                               </PopoverTrigger>
                               <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                  selected={field.value}
-                                  onSelect={field!.onChange}
-                                  disabled={(date: any) => date < new Date()}
-                                  initialFocus
-                                />
+                                
                               </PopoverContent>
                             </Popover>
                             <FormMessage />

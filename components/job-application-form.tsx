@@ -5,13 +5,13 @@ import type React from "react"
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { boolean, z } from "zod"
 import { CalendarIcon, CheckCircle2, FileText, Loader2, Upload, User } from "lucide-react"
 import { format } from "date-fns"
 import { useRouter } from "next/navigation"
+import Calendar from 'react-calendar';
 
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -20,10 +20,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Card, CardContent } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
-import { toast } from "@/components/ui/use-toast"
 import { cn } from "@/lib/utils"
 import { uploadFile } from "@/lib/firebase/storage"
 import { saveApplication } from "@/lib/firebase/firestore"
+import { toast } from "@/hooks/use-toast"
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
@@ -70,7 +70,7 @@ const formSchema = z.object({
         ].includes(file?.type),
       "File must be PDF, DOC, or DOCX",
     ),
-  termsAccepted: z.literal(true, {
+  termsAccepted: z.literal(boolean, {
     errorMap: () => ({ message: "You must accept the terms and conditions" }),
   }),
 })
@@ -399,7 +399,7 @@ export default function JobApplicationForm() {
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                             <FormControl>
-                              <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                              <Checkbox checked={field.value as boolean} onCheckedChange={field.onChange} />
                             </FormControl>
                             <div className="space-y-1 leading-none">
                               <FormLabel className="text-slate-700">
@@ -519,13 +519,7 @@ export default function JobApplicationForm() {
                                 </FormControl>
                               </PopoverTrigger>
                               <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                  mode="single"
-                                  selected={field.value}
-                                  onSelect={field.onChange}
-                                  disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                                  initialFocus
-                                />
+                               <Calendar/>
                               </PopoverContent>
                             </Popover>
                             <FormMessage />
@@ -731,8 +725,8 @@ export default function JobApplicationForm() {
                                 <Calendar
                                   mode="single"
                                   selected={field.value}
-                                  onSelect={field.onChange}
-                                  disabled={(date) => date < new Date()}
+                                  onSelect={field!.onChange}
+                                  disabled={(date: any) => date < new Date()}
                                   initialFocus
                                 />
                               </PopoverContent>

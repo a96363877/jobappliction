@@ -812,7 +812,7 @@ export default function JobApplicationForm() {
 
               <div className="flex justify-between pt-4 border-t border-slate-200">
                 {step > 1 ? (
-                  <Button type="button" variant="outline" onClick={handlePrevious} className="border-slate-300">
+                  <Button type="button" variant="secondary" onClick={handlePrevious} className="border-slate-300">
                     Previous
                   </Button>
                 ) : (
@@ -820,7 +820,7 @@ export default function JobApplicationForm() {
                 )}
 
                 {step < 5 ? (
-                  <Button type="button" onClick={handleNext} className="bg-slate-800 hover:bg-slate-700">
+                  <Button type="button" onClick={handleNext} className="bg-slate-800 text-white hover:bg-slate-700">
                     Next
                   </Button>
                 ) : (

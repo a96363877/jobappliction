@@ -1,16 +1,7 @@
 import { redirect } from "next/navigation"
-import { getServerSession } from "next-auth"
-
-import { authOptions } from "@/lib/auth"
 import JobApplicationForm from "@/components/job-application-form"
-
 export default async function Home() {
-  const session = await getServerSession(authOptions)
 
-  // If user is authenticated and is an admin, redirect to dashboard
-  if (session?.user?.role === "admin") {
-    redirect("/dashboard")
-  }
 
   return (
     <main className="min-h-screen bg-slate-50">

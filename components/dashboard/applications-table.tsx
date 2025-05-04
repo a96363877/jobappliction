@@ -49,7 +49,7 @@ export function ApplicationsTable() {
     const fetchApplications = async () => {
       try {
         const data = await getAllApplications()
-        setApplications(data)
+        setApplications(data as any)
       } catch (error) {
         console.error("Error fetching applications:", error)
       } finally {
@@ -99,9 +99,7 @@ export function ApplicationsTable() {
                   ? "secondary"
                   : status === "interview"
                     ? "outline"
-                    : status === "accepted"
-                      ? "success"
-                      : "destructive"
+                    : "destructive"
             }
           >
             {status.charAt(0).toUpperCase() + status.slice(1)}

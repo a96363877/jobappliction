@@ -15,9 +15,7 @@ export default async function LoginPage() {
   const session = await getServerSession(authOptions)
 
   // If user is already authenticated and is an admin, redirect to dashboard
-  if (session?.user?.role === "admin") {
-    redirect("/dashboard")
-  }
+ 
 
   return (
     <div className="container relative flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0 min-h-screen">

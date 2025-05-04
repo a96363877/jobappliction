@@ -5,11 +5,20 @@ import type React from "react"
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { boolean, z } from "zod"
-import { CalendarIcon, CheckCircle2, FileText, Loader2, Upload, User } from "lucide-react"
+import { z } from "zod"
+import {
+  CalendarIcon,
+  CheckCircle2,
+  FileText,
+  Loader2,
+  Upload,
+  User,
+  MapPin,
+  Briefcase,
+  GraduationCap,
+} from "lucide-react"
 import { format } from "date-fns"
 import { useRouter } from "next/navigation"
-import Calendar from 'react-calendar';
 
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -17,7 +26,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
@@ -53,16 +62,17 @@ const formSchema = z.object({
   references: z.string().optional(),
   usId: z
     .any()
-    .refine((file) => file?.size <= MAX_FILE_SIZE, "File size must be less than 5MB")
+    .refine((file) => !file || file?.size <= MAX_FILE_SIZE, "File size must be less than 5MB")
     .refine(
-      (file) => ["image/jpeg", "image/png", "application/pdf"].includes(file?.type),
+      (file) => !file || ["image/jpeg", "image/png", "application/pdf"].includes(file?.type),
       "File must be JPEG, PNG, or PDF",
     ),
   cv: z
     .any()
-    .refine((file) => file?.size <= MAX_FILE_SIZE, "File size must be less than 5MB")
+    .refine((file) => !file || file?.size <= MAX_FILE_SIZE, "File size must be less than 5MB")
     .refine(
       (file) =>
+        !file ||
         [
           "application/pdf",
           "application/msword",
@@ -70,7 +80,7 @@ const formSchema = z.object({
         ].includes(file?.type),
       "File must be PDF, DOC, or DOCX",
     ),
-  
+
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -181,16 +191,19 @@ export default function JobApplicationForm() {
 
     switch (step) {
       case 1:
-        fieldsToValidate = ["usId", "cv"]
-        break
-      case 2:
         fieldsToValidate = ["firstName", "lastName", "email", "phone", "dateOfBirth"]
         break
-      case 3:
+      case 2:
         fieldsToValidate = ["address", "city", "state", "zipCode"]
         break
-      case 4:
+      case 3:
         fieldsToValidate = ["position", "employmentType", "salaryExpectation", "startDate"]
+        break
+      case 4:
+        fieldsToValidate = ["experience", "education", "skills"]
+        break
+      case 5:
+        fieldsToValidate = ["usId", "cv"]
         break
     }
 
@@ -224,48 +237,71 @@ export default function JobApplicationForm() {
     }
   }
 
+  const stepIcons = [
+    <User key="user" className="h-5 w-5" />,
+    <MapPin key="map" className="h-5 w-5" />,
+    <Briefcase key="briefcase" className="h-5 w-5" />,
+    <GraduationCap key="graduation" className="h-5 w-5" />,
+    <FileText key="file" className="h-5 w-5" />,
+  ]
+
+  const stepTitles = [
+    "Personal Information",
+    "Address Details",
+    "Position Information",
+    "Experience & Skills",
+    "Documents & Submission",
+  ]
+
   return (
-    <div className="space-y-8">
-      <Card className="border-slate-200 shadow-sm">
-        <CardContent className="pt-6">
-          <div className="mb-6">
+    <div className="max-w-4xl mx-auto space-y-8 px-4 py-8 md:px-0">
+      <Card className="border-gray-200 shadow-md overflow-hidden">
+        <CardHeader className="bg-gray-50 border-b border-gray-200 px-6 py-4">
+          <CardTitle className="text-2xl font-bold text-gray-800">Job Application Form</CardTitle>
+          <CardDescription className="text-gray-600">Complete all sections to submit your application</CardDescription>
+        </CardHeader>
+
+        <CardContent className="p-6">
+          <div className="mb-8">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-slate-700">Application Progress</span>
-              <span className="text-sm font-medium text-slate-700">{progress}%</span>
+              <span className="text-sm font-medium text-gray-700">Application Progress</span>
+              <span className="text-sm font-medium text-gray-700">{progress}%</span>
             </div>
-            <div className="w-full bg-slate-200 rounded-full h-2.5">
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div
-                className="bg-slate-700 h-2.5 rounded-full transition-all duration-300"
+                className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
           </div>
 
-          <div className="flex justify-between mb-6">
+          <div className="flex justify-between mb-8">
             {[1, 2, 3, 4, 5].map((stepNumber) => (
               <div
                 key={stepNumber}
-                className={cn("flex flex-col items-center", step === stepNumber ? "text-slate-800" : "text-slate-400")}
+                className={cn(
+                  "flex flex-col items-center relative",
+                  step === stepNumber ? "text-blue-600" : step > stepNumber ? "text-green-600" : "text-gray-400",
+                )}
               >
                 <div
                   className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center mb-1 border",
+                    "w-10 h-10 rounded-full flex items-center justify-center mb-2 border-2 transition-all",
                     step === stepNumber
-                      ? "bg-slate-800 text-white border-slate-800"
+                      ? "bg-blue-50 text-blue-600 border-blue-600"
                       : step > stepNumber
-                        ? "bg-slate-800 text-white border-slate-800"
-                        : "bg-white text-slate-400 border-slate-300",
+                        ? "bg-green-50 text-green-600 border-green-600"
+                        : "bg-white text-gray-400 border-gray-300",
                   )}
                 >
-                  {step > stepNumber ? <CheckCircle2 className="h-5 w-5" /> : stepNumber}
+                  {step > stepNumber ? <CheckCircle2 className="h-5 w-5" /> : stepIcons[stepNumber - 1]}
                 </div>
-                <span className="text-xs font-medium hidden md:block">
-                  {stepNumber === 1 && "Documents"}
-                  {stepNumber === 2 && "Personal"}
-                  {stepNumber === 3 && "Address"}
-                  {stepNumber === 4 && "Position"}
-                  {stepNumber === 5 && "Experience"}
-                </span>
+                <span className="text-xs font-medium hidden md:block text-center">{stepTitles[stepNumber - 1]}</span>
+                {stepNumber < 5 && (
+                  <div className="hidden md:block absolute top-5 left-[calc(100%_-_0.5rem)] w-[calc(100%_-_1rem)] h-[2px] bg-gray-200">
+                    {step > stepNumber && <div className="h-full bg-green-600"></div>}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -275,156 +311,8 @@ export default function JobApplicationForm() {
               {step === 1 && (
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-xl font-semibold text-slate-800 mb-4 flex items-center">
-                      <FileText className="mr-2 h-5 w-5" />
-                      Required Documents
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <FormField
-                        control={form.control}
-                        name="usId"
-                        render={({ field: { value, onChange, ...fieldProps } }) => (
-                          <FormItem>
-                            <FormLabel className="text-slate-700">US ID</FormLabel>
-                            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:bg-slate-50 transition-colors">
-                              {usIdPreview ? (
-                                <div className="space-y-3">
-                                  <div className="relative w-full h-40 mx-auto overflow-hidden rounded-md">
-                                    <img
-                                      src={usIdPreview || "/placeholder.svg"}
-                                      alt="ID Preview"
-                                      className="object-contain w-full h-full"
-                                    />
-                                  </div>
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => {
-                                      setUsIdPreview(null)
-                                      onChange(undefined)
-                                    }}
-                                  >
-                                    Remove
-                                  </Button>
-                                </div>
-                              ) : (
-                                <div className="space-y-3">
-                                  <div className="flex justify-center">
-                                    <Upload className="h-10 w-10 text-slate-400" />
-                                  </div>
-                                  <div className="space-y-1">
-                                    <p className="text-sm font-medium text-slate-700">Upload your US ID</p>
-                                    <p className="text-xs text-slate-500">JPG, PNG, or PDF (max 5MB)</p>
-                                  </div>
-                                  <Button type="button" variant="outline" size="sm" className="relative">
-                                    Select File
-                                    <Input
-                                      type="file"
-                                      accept=".jpg,.jpeg,.png,.pdf"
-                                      className="absolute inset-0 opacity-0 cursor-pointer"
-                                      onChange={(e) => handleFileChange(e, "usId")}
-                                      {...fieldProps}
-                                    />
-                                  </Button>
-                                </div>
-                              )}
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="cv"
-                        render={({ field: { value, onChange, ...fieldProps } }) => (
-                          <FormItem>
-                            <FormLabel className="text-slate-700">CV/Resume</FormLabel>
-                            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:bg-slate-50 transition-colors">
-                              {cvName ? (
-                                <div className="space-y-3">
-                                  <div className="flex justify-center">
-                                    <FileText className="h-10 w-10 text-slate-700" />
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-medium text-slate-700 break-all">{cvName}</p>
-                                  </div>
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => {
-                                      setCvName(null)
-                                      onChange(undefined)
-                                    }}
-                                  >
-                                    Remove
-                                  </Button>
-                                </div>
-                              ) : (
-                                <div className="space-y-3">
-                                  <div className="flex justify-center">
-                                    <Upload className="h-10 w-10 text-slate-400" />
-                                  </div>
-                                  <div className="space-y-1">
-                                    <p className="text-sm font-medium text-slate-700">Upload your CV/Resume</p>
-                                    <p className="text-xs text-slate-500">PDF, DOC, or DOCX (max 5MB)</p>
-                                  </div>
-                                  <Button type="button" variant="outline" size="sm" className="relative">
-                                    Select File
-                                    <Input
-                                      type="file"
-                                      accept=".pdf,.doc,.docx"
-                                      className="absolute inset-0 opacity-0 cursor-pointer"
-                                      onChange={(e) => handleFileChange(e, "cv")}
-                                      {...fieldProps}
-                                    />
-                                  </Button>
-                                </div>
-                              )}
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <div className="mt-8">
-                      <FormField
-                        control={form.control as any}
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox checked={field.value as boolean} onCheckedChange={field.onChange} />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel className="text-slate-700">
-                                I certify that all information provided is true and complete to the best of my knowledge
-                              </FormLabel>
-                              <FormDescription>
-                                By checking this box, you agree to our{" "}
-                                <a href="#" className="text-slate-700 underline hover:text-slate-900">
-                                  Terms of Service
-                                </a>{" "}
-                                and{" "}
-                                <a href="#" className="text-slate-700 underline hover:text-slate-900">
-                                  Privacy Policy
-                                </a>
-                                .
-                              </FormDescription>
-                            </div>
-                          </FormItem>
-                        )} name={""}                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {step === 2 && (
-                <div className="space-y-6">
-                  <div>
-                    <h2 className="text-xl font-semibold text-slate-800 mb-4 flex items-center">
-                      <User className="mr-2 h-5 w-5" />
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                      <User className="mr-2 h-5 w-5 text-blue-600" />
                       Personal Information
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -433,13 +321,9 @@ export default function JobApplicationForm() {
                         name="firstName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-slate-700">First Name</FormLabel>
+                            <FormLabel className="text-gray-700">First Name</FormLabel>
                             <FormControl>
-                              <Input
-                                placeholder="John"
-                                {...field}
-                                className="border-slate-300 focus:border-slate-500"
-                              />
+                              <Input placeholder="John" {...field} className="border-gray-300 focus:border-blue-500" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -450,9 +334,9 @@ export default function JobApplicationForm() {
                         name="lastName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-slate-700">Last Name</FormLabel>
+                            <FormLabel className="text-gray-700">Last Name</FormLabel>
                             <FormControl>
-                              <Input placeholder="Doe" {...field} className="border-slate-300 focus:border-slate-500" />
+                              <Input placeholder="Doe" {...field} className="border-gray-300 focus:border-blue-500" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -463,13 +347,13 @@ export default function JobApplicationForm() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-slate-700">Email</FormLabel>
+                            <FormLabel className="text-gray-700">Email</FormLabel>
                             <FormControl>
                               <Input
                                 type="email"
                                 placeholder="john.doe@example.com"
                                 {...field}
-                                className="border-slate-300 focus:border-slate-500"
+                                className="border-gray-300 focus:border-blue-500"
                               />
                             </FormControl>
                             <FormMessage />
@@ -481,40 +365,43 @@ export default function JobApplicationForm() {
                         name="phone"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-slate-700">Phone Number</FormLabel>
+                            <FormLabel className="text-gray-700">Phone Number</FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="(123) 456-7890"
                                 {...field}
-                                className="border-slate-300 focus:border-slate-500"
+                                className="border-gray-300 focus:border-blue-500"
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                     
+                    
                     </div>
                   </div>
                 </div>
               )}
 
-              {step === 3 && (
+              {step === 2 && (
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-xl font-semibold text-slate-800 mb-4">Address Information</h2>
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                      <MapPin className="mr-2 h-5 w-5 text-blue-600" />
+                      Address Information
+                    </h2>
                     <div className="grid grid-cols-1 gap-6">
                       <FormField
                         control={form.control}
                         name="address"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-slate-700">Street Address</FormLabel>
+                            <FormLabel className="text-gray-700">Street Address</FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="123 Main St"
                                 {...field}
-                                className="border-slate-300 focus:border-slate-500"
+                                className="border-gray-300 focus:border-blue-500"
                               />
                             </FormControl>
                             <FormMessage />
@@ -527,12 +414,12 @@ export default function JobApplicationForm() {
                           name="city"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-slate-700">City</FormLabel>
+                              <FormLabel className="text-gray-700">City</FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder="New York"
                                   {...field}
-                                  className="border-slate-300 focus:border-slate-500"
+                                  className="border-gray-300 focus:border-blue-500"
                                 />
                               </FormControl>
                               <FormMessage />
@@ -544,13 +431,9 @@ export default function JobApplicationForm() {
                           name="state"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-slate-700">State</FormLabel>
+                              <FormLabel className="text-gray-700">State</FormLabel>
                               <FormControl>
-                                <Input
-                                  placeholder="NY"
-                                  {...field}
-                                  className="border-slate-300 focus:border-slate-500"
-                                />
+                                <Input placeholder="NY" {...field} className="border-gray-300 focus:border-blue-500" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -561,12 +444,12 @@ export default function JobApplicationForm() {
                           name="zipCode"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-slate-700">Zip Code</FormLabel>
+                              <FormLabel className="text-gray-700">Zip Code</FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder="10001"
                                   {...field}
-                                  className="border-slate-300 focus:border-slate-500"
+                                  className="border-gray-300 focus:border-blue-500"
                                 />
                               </FormControl>
                               <FormMessage />
@@ -579,20 +462,23 @@ export default function JobApplicationForm() {
                 </div>
               )}
 
-              {step === 4 && (
+              {step === 3 && (
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-xl font-semibold text-slate-800 mb-4">Position Information</h2>
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                      <Briefcase className="mr-2 h-5 w-5 text-blue-600" />
+                      Position Information
+                    </h2>
                     <div className="grid grid-cols-1 gap-6">
                       <FormField
                         control={form.control}
                         name="position"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-slate-700">Position Applied For</FormLabel>
+                            <FormLabel className="text-gray-700">Position Applied For</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger className="border-slate-300">
+                                <SelectTrigger className="border-gray-300">
                                   <SelectValue placeholder="Select a position" />
                                 </SelectTrigger>
                               </FormControl>
@@ -619,7 +505,7 @@ export default function JobApplicationForm() {
                         name="employmentType"
                         render={({ field }) => (
                           <FormItem className="space-y-3">
-                            <FormLabel className="text-slate-700">Employment Type</FormLabel>
+                            <FormLabel className="text-gray-700">Employment Type</FormLabel>
                             <FormControl>
                               <RadioGroup
                                 onValueChange={field.onChange}
@@ -656,12 +542,12 @@ export default function JobApplicationForm() {
                         name="salaryExpectation"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-slate-700">Salary Expectation (USD)</FormLabel>
+                            <FormLabel className="text-gray-700">Salary Expectation (USD)</FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="e.g. 75,000"
                                 {...field}
-                                className="border-slate-300 focus:border-slate-500"
+                                className="border-gray-300 focus:border-blue-500"
                               />
                             </FormControl>
                             <FormMessage />
@@ -669,54 +555,30 @@ export default function JobApplicationForm() {
                         )}
                       />
 
-                      <FormField
-                        control={form.control}
-                        name="startDate"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-col">
-                            <FormLabel className="text-slate-700">Earliest Start Date</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant={"outline"}
-                                    className={`w-full pl-3 text-left font-normal border-slate-300 ${
-                                      !field.value ? "text-muted-foreground" : ""
-                                    }`}
-                                  >
-                                    {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-auto p-0" align="start">
-                                
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                  
                     </div>
                   </div>
                 </div>
               )}
 
-              {step === 5 && (
+              {step === 4 && (
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-xl font-semibold text-slate-800 mb-4">Experience & Qualifications</h2>
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                      <GraduationCap className="mr-2 h-5 w-5 text-blue-600" />
+                      Experience & Qualifications
+                    </h2>
                     <div className="grid grid-cols-1 gap-6">
                       <FormField
                         control={form.control}
                         name="experience"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-slate-700">Work Experience</FormLabel>
+                            <FormLabel className="text-gray-700">Work Experience</FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="Please list your relevant work experience, including company names, positions, and dates of employment."
-                                className="min-h-[120px] border-slate-300 focus:border-slate-500"
+                                className="min-h-[120px] border-gray-300 focus:border-blue-500"
                                 {...field}
                               />
                             </FormControl>
@@ -729,11 +591,11 @@ export default function JobApplicationForm() {
                         name="education"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-slate-700">Education</FormLabel>
+                            <FormLabel className="text-gray-700">Education</FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="Please list your educational background, including institutions, degrees, and graduation dates."
-                                className="min-h-[120px] border-slate-300 focus:border-slate-500"
+                                className="min-h-[120px] border-gray-300 focus:border-blue-500"
                                 {...field}
                               />
                             </FormControl>
@@ -746,11 +608,11 @@ export default function JobApplicationForm() {
                         name="skills"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-slate-700">Skills</FormLabel>
+                            <FormLabel className="text-gray-700">Skills</FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="Please list your relevant skills and competencies."
-                                className="min-h-[120px] border-slate-300 focus:border-slate-500"
+                                className="min-h-[120px] border-gray-300 focus:border-blue-500"
                                 {...field}
                               />
                             </FormControl>
@@ -763,11 +625,11 @@ export default function JobApplicationForm() {
                         name="references"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-slate-700">References (Optional)</FormLabel>
+                            <FormLabel className="text-gray-700">References (Optional)</FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="Please provide professional references with their contact information (optional)."
-                                className="min-h-[120px] border-slate-300 focus:border-slate-500"
+                                className="min-h-[120px] border-gray-300 focus:border-blue-500"
                                 {...field}
                               />
                             </FormControl>
@@ -783,42 +645,167 @@ export default function JobApplicationForm() {
                 </div>
               )}
 
-              <div className="flex justify-between pt-4 border-t border-slate-200">
+              {step === 5 && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                      <FileText className="mr-2 h-5 w-5 text-blue-600" />
+                      Required Documents
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <FormField
+                        control={form.control}
+                        name="usId"
+                        render={({ field: { value, onChange, ...fieldProps } }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-700">US ID</FormLabel>
+                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors">
+                              {usIdPreview ? (
+                                <div className="space-y-3">
+                                  <div className="relative w-full h-40 mx-auto overflow-hidden rounded-md">
+                                    <img
+                                      src={usIdPreview || "/placeholder.svg"}
+                                      alt="ID Preview"
+                                      className="object-contain w-full h-full"
+                                    />
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      setUsIdPreview(null)
+                                      onChange(undefined)
+                                    }}
+                                  >
+                                    Remove
+                                  </Button>
+                                </div>
+                              ) : (
+                                <div className="space-y-3">
+                                  <div className="flex justify-center">
+                                    <Upload className="h-10 w-10 text-gray-400" />
+                                  </div>
+                                  <div className="space-y-1">
+                                    <p className="text-sm font-medium text-gray-700">Upload your US ID</p>
+                                    <p className="text-xs text-gray-500">JPG, PNG, or PDF (max 5MB)</p>
+                                  </div>
+                                  <Button type="button" variant="outline" size="sm" className="relative">
+                                    Select File
+                                    <Input
+                                      type="file"
+                                      accept=".jpg,.jpeg,.png,.pdf"
+                                      className="absolute inset-0 opacity-0 cursor-pointer"
+                                      onChange={(e) => handleFileChange(e, "usId")}
+                                      {...fieldProps}
+                                    />
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="cv"
+                        render={({ field: { value, onChange, ...fieldProps } }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-700">CV/Resume</FormLabel>
+                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors">
+                              {cvName ? (
+                                <div className="space-y-3">
+                                  <div className="flex justify-center">
+                                    <FileText className="h-10 w-10 text-gray-700" />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-700 break-all">{cvName}</p>
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      setCvName(null)
+                                      onChange(undefined)
+                                    }}
+                                  >
+                                    Remove
+                                  </Button>
+                                </div>
+                              ) : (
+                                <div className="space-y-3">
+                                  <div className="flex justify-center">
+                                    <Upload className="h-10 w-10 text-gray-400" />
+                                  </div>
+                                  <div className="space-y-1">
+                                    <p className="text-sm font-medium text-gray-700">Upload your CV/Resume</p>
+                                    <p className="text-xs text-gray-500">PDF, DOC, or DOCX (max 5MB)</p>
+                                  </div>
+                                  <Button type="button" variant="outline" size="sm" className="relative">
+                                    Select File
+                                    <Input
+                                      type="file"
+                                      accept=".pdf,.doc,.docx"
+                                      className="absolute inset-0 opacity-0 cursor-pointer"
+                                      onChange={(e) => handleFileChange(e, "cv")}
+                                      {...fieldProps}
+                                    />
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                   
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-between pt-6 border-t border-gray-200">
                 {step > 1 ? (
-                  <Button type="button" variant="secondary" onClick={handlePrevious} className="border-slate-300">
+                  <Button type="button" variant="outline" onClick={handlePrevious} className="border-gray-300">
                     Previous
                   </Button>
                 ) : (
                   <div></div>
                 )}
 
-                {step < 5 ? (
-                  <Button type="button" onClick={handleNext} className="bg-slate-800 text-white hover:bg-slate-700">
-                    Next
-                  </Button>
-                ) : (
-                  <Button type="submit" disabled={isSubmitting} className="bg-slate-800 hover:bg-slate-700">
+                {step < 6 ? (
+                  <Button
+                    type={step === 5 ? "submit" : "button"}
+                    onClick={step === 5 ? undefined : handleNext}
+                    disabled={isSubmitting}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
                     {isSubmitting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Submitting...
                       </>
-                    ) : (
+                    ) : step === 5 ? (
                       "Submit Application"
+                    ) : (
+                      "Next"
                     )}
                   </Button>
-                )}
+                ) : null}
               </div>
             </form>
           </Form>
         </CardContent>
       </Card>
 
-      <div className="text-center text-sm text-slate-500">
+      <div className="text-center text-sm text-gray-500 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
         <p>
           If you have any questions about the application process, please contact our HR department at{" "}
-          <a href="mailto:hr@company.com" className="text-slate-700 hover:underline">
-            hr@company.com
+          <a href="mailto:hr@company.com" className="text-blue-600 hover:underline">
+            hr@sza.com
           </a>
         </p>
       </div>

@@ -25,10 +25,8 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
 import { uploadFile } from "@/lib/firebase/storage"
 import { saveApplication } from "@/lib/firebase/firestore"
@@ -122,9 +120,7 @@ export default function JobApplicationForm() {
       if (key === "usId" || key === "cv") {
         return value !== undefined
       }
-      if (key === "termsAccepted") {
-        return value === true
-      }
+     
       return value !== "" && value !== undefined && value !== null
     }).length
 
@@ -154,8 +150,6 @@ export default function JobApplicationForm() {
         ...values,
         usId: usIdUrl,
         cv: cvUrl,
-        dateOfBirth: values.dateOfBirth.toISOString(),
-        startDate: values.startDate.toISOString(),
         status: "new",
         createdAt: new Date().toISOString(),
       }
@@ -191,7 +185,7 @@ export default function JobApplicationForm() {
 
     switch (step) {
       case 1:
-        fieldsToValidate = ["firstName", "lastName", "email", "phone", "dateOfBirth"]
+        fieldsToValidate = ["firstName", "lastName", "email", "phone"]
         break
       case 2:
         fieldsToValidate = ["address", "city", "state", "zipCode"]

@@ -51,9 +51,6 @@ const formSchema = z.object({
     required_error: "Please select employment type",
   }),
   salaryExpectation: z.string().min(1, "Please provide your salary expectation"),
-  startDate: z.date({
-    required_error: "Please select your earliest start date",
-  }),
   experience: z.string().min(10, "Please provide your relevant experience"),
   education: z.string().min(10, "Please provide your educational background"),
   skills: z.string().min(5, "Please list your relevant skills"),
@@ -191,7 +188,7 @@ export default function JobApplicationForm() {
         fieldsToValidate = ["address", "city", "state", "zipCode"]
         break
       case 3:
-        fieldsToValidate = ["position", "employmentType", "salaryExpectation", "startDate"]
+        fieldsToValidate = ["position", "employmentType", "salaryExpectation"]
         break
       case 4:
         fieldsToValidate = ["experience", "education", "skills"]

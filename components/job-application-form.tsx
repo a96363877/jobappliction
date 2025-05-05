@@ -81,7 +81,7 @@ type FormValues = z.infer<typeof formSchema>
 export default function JobApplicationForm() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [step, setStep] = useState(3)
+  const [step, setStep] = useState(1)
   const [usIdPreview, setUsIdPreview] = useState<string | null>(null)
   const [cvName, setCvName] = useState<string | null>(null)
 
@@ -306,7 +306,7 @@ export default function JobApplicationForm() {
                           <FormItem>
                             <FormLabel className="text-gray-700">First Name</FormLabel>
                             <FormControl>
-                              <Input placeholder="" {...field} className="border-gray-300 focus:border-blue-500" />
+                              <Input placeholder="Jhon " {...field} className="border-gray-300 focus:border-blue-500" />
                             </FormControl>
                             <FormMessage className="text-red-400" />
                           </FormItem>

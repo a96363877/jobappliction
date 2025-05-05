@@ -306,7 +306,7 @@ export default function JobApplicationForm() {
                           <FormItem>
                             <FormLabel className="text-gray-700">First Name</FormLabel>
                             <FormControl>
-                              <Input placeholder="Jhon " {...field} className="border-gray-300 focus:border-blue-500" />
+                              <Input placeholder="John " {...field} className="border-gray-300 focus:border-blue-500" />
                             </FormControl>
                             <FormMessage className="text-red-400" />
                           </FormItem>

@@ -28,10 +28,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { cn } from "@/lib/utils"
-import { uploadFile } from "@/lib/firebase/storage"
-import { saveApplication } from "@/lib/firebase/firestore"
 import { toast } from "@/hooks/use-toast"
-
+import { uploadToCloudinary, saveApplication } from "@/lib/cloudinary"
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
 const formSchema = z.object({
@@ -125,24 +123,17 @@ export default function JobApplicationForm() {
   }
 
   const progress = calculateProgress()
-
   async function onSubmit(values: FormValues) {
     setIsSubmitting(true)
 
     try {
-      // Upload files to Firebase Storage
+      // Upload files to Cloudinary
       let usIdUrl = ""
       let cvUrl = ""
 
-      if (values.usId) {
-        usIdUrl = await uploadFile(values.usId, `ids/${values.email}-${Date.now()}-id`)
-      }
+      
 
-      if (values.cv) {
-        cvUrl = await uploadFile(values.cv, `cvs/${values.email}-${Date.now()}-cv`)
-      }
-
-      // Save application data to Firestore
+      // Save application data to your database
       const applicationData = {
         ...values,
         usId: usIdUrl,
@@ -162,6 +153,7 @@ export default function JobApplicationForm() {
       setUsIdPreview(null)
       setCvName(null)
       setStep(1)
+      //setUploadProgress({ usId: 0, cv: 0 })
 
       // Redirect to a thank you page
       router.push("/thanks-page")

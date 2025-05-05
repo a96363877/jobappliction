@@ -81,7 +81,7 @@ type FormValues = z.infer<typeof formSchema>
 export default function JobApplicationForm() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(3)
   const [usIdPreview, setUsIdPreview] = useState<string | null>(null)
   const [cvName, setCvName] = useState<string | null>(null)
 
@@ -306,9 +306,9 @@ export default function JobApplicationForm() {
                           <FormItem>
                             <FormLabel className="text-gray-700">First Name</FormLabel>
                             <FormControl>
-                              <Input placeholder="John" {...field} className="border-gray-300 focus:border-blue-500" />
+                              <Input placeholder="" {...field} className="border-gray-300 focus:border-blue-500" />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-red-400" />
                           </FormItem>
                         )}
                       />
@@ -321,7 +321,7 @@ export default function JobApplicationForm() {
                             <FormControl>
                               <Input placeholder="Doe" {...field} className="border-gray-300 focus:border-blue-500" />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-red-400" />
                           </FormItem>
                         )}
                       />
@@ -339,7 +339,7 @@ export default function JobApplicationForm() {
                                 className="border-gray-300 focus:border-blue-500"
                               />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-red-400" />
                           </FormItem>
                         )}
                       />
@@ -356,7 +356,7 @@ export default function JobApplicationForm() {
                                 className="border-gray-300 focus:border-blue-500"
                               />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-red-400" />
                           </FormItem>
                         )}
                       />
@@ -387,7 +387,7 @@ export default function JobApplicationForm() {
                                 className="border-gray-300 focus:border-blue-500"
                               />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-red-400" />
                           </FormItem>
                         )}
                       />
@@ -405,7 +405,7 @@ export default function JobApplicationForm() {
                                   className="border-gray-300 focus:border-blue-500"
                                 />
                               </FormControl>
-                              <FormMessage />
+                              <FormMessage className="text-red-400" />
                             </FormItem>
                           )}
                         />
@@ -418,7 +418,7 @@ export default function JobApplicationForm() {
                               <FormControl>
                                 <Input placeholder="NY" {...field} className="border-gray-300 focus:border-blue-500" />
                               </FormControl>
-                              <FormMessage />
+                              <FormMessage className="text-red-400" />
                             </FormItem>
                           )}
                         />
@@ -435,7 +435,7 @@ export default function JobApplicationForm() {
                                   className="border-gray-300 focus:border-blue-500"
                                 />
                               </FormControl>
-                              <FormMessage />
+                              <FormMessage className="text-red-400" />
                             </FormItem>
                           )}
                         />
@@ -465,7 +465,7 @@ export default function JobApplicationForm() {
                                   <SelectValue placeholder="Select a position" />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent>
+                              <SelectContent className="bg-white">
                                 <SelectItem value="software-engineer">Software Engineer</SelectItem>
                                 <SelectItem value="senior-software-engineer">Senior Software Engineer</SelectItem>
                                 <SelectItem value="product-manager">Product Manager</SelectItem>
@@ -478,7 +478,7 @@ export default function JobApplicationForm() {
                                 <SelectItem value="finance-analyst">Finance Analyst</SelectItem>
                               </SelectContent>
                             </Select>
-                            <FormMessage />
+                            <FormMessage className="text-red-400" />
                           </FormItem>
                         )}
                       />
@@ -515,7 +515,7 @@ export default function JobApplicationForm() {
                                 </FormItem>
                               </RadioGroup>
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-red-400" />
                           </FormItem>
                         )}
                       />
@@ -533,7 +533,7 @@ export default function JobApplicationForm() {
                                 className="border-gray-300 focus:border-blue-500"
                               />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-red-400" />
                           </FormItem>
                         )}
                       />
@@ -565,7 +565,7 @@ export default function JobApplicationForm() {
                                 {...field}
                               />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-red-400" />
                           </FormItem>
                         )}
                       />
@@ -582,7 +582,7 @@ export default function JobApplicationForm() {
                                 {...field}
                               />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-red-400" />
                           </FormItem>
                         )}
                       />
@@ -599,7 +599,7 @@ export default function JobApplicationForm() {
                                 {...field}
                               />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-red-400" />
                           </FormItem>
                         )}
                       />
@@ -619,7 +619,7 @@ export default function JobApplicationForm() {
                             <FormDescription>
                               References are optional but may strengthen your application.
                             </FormDescription>
-                            <FormMessage />
+                            <FormMessage className="text-red-400" />
                           </FormItem>
                         )}
                       />
@@ -686,7 +686,7 @@ export default function JobApplicationForm() {
                                 </div>
                               )}
                             </div>
-                            <FormMessage />
+                            <FormMessage className="text-red-400" />
                           </FormItem>
                         )}
                       />
@@ -739,7 +739,7 @@ export default function JobApplicationForm() {
                                 </div>
                               )}
                             </div>
-                            <FormMessage />
+                            <FormMessage className="text-red-400" />
                           </FormItem>
                         )}
                       />
